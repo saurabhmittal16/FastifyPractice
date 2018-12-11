@@ -17,22 +17,17 @@ app.get('/', async (req, res) => {
 
 routes.forEach(route => app.route(route));
 
-// Starting app
-const start = async () => {
-    try {
-        mongoose.connect(
-            mongo_url, 
-            {useNewUrlParser: true}
-        )
-        .then(() => console.log("Connected to DB"))
-        .catch(err => console.log(err.message));
-        
-        await app.listen(3000);
-        console.log(`Server listening on port ${app.server.address().port}`);
-    } catch (err) {
-        app.log.error(err);
-        process.exit(1);
-    }
-}
-
-start();
+mongoose.connect(mongo_url, {useNewUrlParser: true})
+    .then(
+        () => {
+            console.log("Connected to DB")
+            app.listen(3000, function(err, address) {
+                if (err) {
+                    fastify.log.error(err);
+                    process.exit(1);
+                }
+                console.log(`Server listening on ${address}`);
+            });
+        }
+    )
+    .catch(err => console.log(err.message));

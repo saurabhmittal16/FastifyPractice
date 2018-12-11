@@ -15,6 +15,18 @@ const routes = [
         method: 'POST',
         url: '/api/cars',
         handler: carController.addCar,
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    title: {type: 'string'},
+                    brand: {type: 'string'},
+                    price: {type: 'string'},
+                    age: {type: 'number'}
+                },
+                required: ['title', 'brand', 'price', 'age']
+            }
+        }
     },
     {
         method: 'PUT',
