@@ -1,15 +1,48 @@
 const fastify = require('fastify')
 const mongoose = require('mongoose');
+const jsonwebtoken = require('jsonwebtoken');
 const app = fastify();
 
-// Requiring Routes
+const config = require('./config');
 const routes = require('./routes/index');
 
-// MongoDB connection URL
 const mongo_url = "mongodb://localhost:27017/fastify";
 
+app.register(require('fastify-url-data'), (err) => {
+    if (err) throw err
+})
+
+app.addHook('preHandler', (request, reply, next) => {
+    const urlData = request.urlData();
+    
+    if (urlData.path === '/api/auth/signup' || urlData.path === '/api/auth/login') {
+        // No checking for token if auth routes
+        next();
+    } else {
+        console.log("Checking for token");
+        let token = request.headers['authorization'];
+
+        if (token) {
+            token = token.split(" ")[1];
+            jsonwebtoken.verify(token, config.secret, (err, decoded) => {
+                if (err) {
+                    reply.code(401)
+                    next(new Error("Authentication failed"));
+                } else {
+                    request.decoded = decoded;
+                    console.log("Login successful");
+                    next();
+                }
+            });
+        } else {
+            reply.code(401)
+            next(new Error("Authentication failed"));
+        }
+    }
+})
+
 // Registering the routes
-app.get('/', async (req, res) => {
+app.get('/', async (request, res) => {
     return {
         hello: 'world'
     }

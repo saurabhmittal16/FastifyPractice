@@ -6,7 +6,7 @@ exports.getCars = (req, res) => {
     return Car.find().exec()
     .then(
         data => {
-            console.log(data);
+            // console.log(data);
             return data;
         }
     )
