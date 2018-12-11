@@ -5,6 +5,8 @@ const carSchema = new mongoose.Schema({
     brand: String,
     price: String,
     age: Number,
+}, {
+    versionKey: false
 })
 
 module.exports = mongoose.model('Car', carSchema);
