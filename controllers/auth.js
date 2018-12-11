@@ -1,6 +1,8 @@
 const boom = require('boom');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+const config = require('../config');
 const User = require('../models/user');
 
 exports.login = async (req, res) => {
@@ -11,8 +13,20 @@ exports.login = async (req, res) => {
         if (foundUser) {
             const isValid = bcrypt.compareSync(password, foundUser.password);
     
+            if (isValid) {
+                const token = jwt.sign({
+                    username: foundUser.username
+                }, config.secret, {
+                    expiresIn: 60 * 60 * 24 * 7
+                });
+
+                return {
+                    "message": "Login successful",
+                    "token": token
+                }
+            }
             return {
-                "message": isValid ? "Login successful" : "Invalid password"
+                "message": "Invalid password"
             }
         } else {
             return {
@@ -39,8 +53,16 @@ exports.signup = async (req, res) => {
         const createdUser = await User.create({
             username, password
         });
+
+        const token = jwt.sign({
+            username: createdUser.username
+        }, config.secret, {
+            expiresIn: 60 * 60 * 24 * 7
+        });
+        
         return {
-            "message": "User created"
+            "message": "User created",
+            "token": token
         }
     } catch (err) {
         console.log(err);
