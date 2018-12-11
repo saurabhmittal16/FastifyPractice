@@ -7,6 +7,7 @@ exports.getCars = (req, res) => {
     .then(
         data => {
             // console.log(data);
+            console.log(req.decoded);
             return data;
         }
     )

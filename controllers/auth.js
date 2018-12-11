@@ -15,7 +15,8 @@ exports.login = async (req, res) => {
     
             if (isValid) {
                 const token = jwt.sign({
-                    username: foundUser.username
+                    username: foundUser.username,
+                    id: foundUser._id
                 }, config.secret, {
                     expiresIn: 60 * 60 * 24 * 7
                 });
@@ -55,7 +56,8 @@ exports.signup = async (req, res) => {
         });
 
         const token = jwt.sign({
-            username: createdUser.username
+            username: createdUser.username,
+            id: createdUser._id
         }, config.secret, {
             expiresIn: 60 * 60 * 24 * 7
         });
